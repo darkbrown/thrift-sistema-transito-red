@@ -1,0 +1,126 @@
+#include <iostream>
+#include <stdlib.h>
+#include "ApiServidor.h"
+#include "ConexionesDB.cpp"
+#include <thrift/protocol/TBinaryProtocol.h>
+#include <thrift/server/TSimpleServer.h>
+#include <thrift/transport/TServerSocket.h>
+#include <thrift/transport/TBufferTransports.h>
+#include <cstring>
+#include <QDebug>
+#include <QString>
+
+using namespace ::apache::thrift;
+using namespace ::apache::thrift::protocol;
+using namespace ::apache::thrift::transport;
+using namespace ::apache::thrift::server;
+using namespace std;
+
+using boost::shared_ptr;
+
+using namespace  ::Thrift;
+
+class ApiServidorHandler : virtual public ApiServidorIf {
+    ConexionesDB conexiones;
+public:
+    ApiServidorHandler() {
+        qDebug() << "Servidor iniciado";
+        conexiones.abrirConexion();
+        conexiones.cerrarConexion();
+}
+
+  bool verificarFuncionario(const std::string& usuario, const std::string& contrasena) {
+      list<FuncionarioDB> resultado = conexiones.getFuncionario(QString::fromStdString(usuario));
+      if(resultado.size() > 0){
+         if(contrasena == resultado.front().contrasena.toStdString()){
+             return true;
+         }else{
+           return false;
+         }
+      }else{
+          return false;
+      }
+  }
+
+  void getFuncionario(Funcionario& _return, const std::string& usuario) {
+      list<FuncionarioDB> resultado = conexiones.getFuncionario(QString::fromStdString(usuario));
+      Funcionario funcionario;
+      funcionario.__set_cargo(resultado.front().cargo.toStdString());
+      funcionario.__set_nombre(resultado.front().nombre.toStdString());
+      funcionario.__set_estatus(resultado.front().estatus);
+      funcionario.__set_usuario(resultado.front().usuario.toStdString());
+
+      _return = funcionario;
+  }
+
+  void getFuncionarios(std::vector<Funcionario> & _return) {
+    // Your implementation goes here
+    printf("getFuncionarios\n");
+  }
+
+  bool cambiarEstatusFuncionario(const std::string& usuario) {
+    return conexiones.cambiarEstatusFuncionario(QString::fromStdString(usuario));
+  }
+
+  bool modificarPerito(const Funcionario& peritoAnterior, const Funcionario& peritoNuevo) {
+      FuncionarioDB peritoDbNuevo;
+      FuncionarioDB peritoDbAnterior;
+      peritoDbAnterior.nombre = QString::fromStdString(peritoAnterior.nombre);
+      peritoDbAnterior.usuario = QString::fromStdString(peritoAnterior.usuario);
+
+      peritoDbNuevo.nombre = QString::fromStdString(peritoNuevo.nombre);
+      peritoDbNuevo.usuario = QString::fromStdString(peritoNuevo.usuario);
+      return conexiones.modificarPerito(peritoDbAnterior, peritoDbNuevo);
+  }
+
+  bool cambiarContrasenaPerito(const std::string& usuario, const std::string& contrasena) {
+     return conexiones.cambiarContrasena(QString::fromStdString(usuario), QString::fromStdString(contrasena));
+  }
+
+  bool registrarPerito(const Funcionario& perito) {
+      FuncionarioDB peritodb;
+      peritodb.cargo = QString::fromStdString(perito.cargo);
+      peritodb.contrasena = QString::fromStdString(perito.contrasena);
+      peritodb.nombre = QString::fromStdString(perito.nombre);
+      peritodb.estatus = perito.estatus;
+      peritodb.usuario = QString::fromStdString(perito.usuario);
+      return conexiones.registrarPerito(peritodb);
+  }
+
+  void getPerito(Funcionario& _return, const std::string& usuario) {
+    // Your implementation goes here
+    printf("getPerito\n");
+  }
+
+  void getPeritos(std::vector<Funcionario> & _return) {
+      vector<FuncionarioDB> resultado = conexiones.getPeritos();
+      vector<Funcionario> respuesta;
+      Funcionario funcionario;
+
+      for (int i=0; i < resultado.size() ;i++) {
+          funcionario.__set_nombre(resultado[i].nombre.toStdString());
+          funcionario.__set_cargo(resultado[i].cargo.toStdString());
+          funcionario.__set_nombre(resultado[i].nombre.toStdString());
+          funcionario.__set_estatus(resultado[i].estatus);
+          funcionario.__set_usuario(resultado[i].usuario.toStdString());
+          respuesta.push_back(funcionario);
+      }
+
+      _return = respuesta;
+  }
+
+};
+
+int main(int argc, char **argv) {
+  int port = 9090;
+  ::apache::thrift::stdcxx::shared_ptr<ApiServidorHandler> handler(new ApiServidorHandler());
+  ::apache::thrift::stdcxx::shared_ptr<TProcessor> processor(new ApiServidorProcessor(handler));
+  ::apache::thrift::stdcxx::shared_ptr<TServerTransport> serverTransport(new TServerSocket(port));
+  ::apache::thrift::stdcxx::shared_ptr<TTransportFactory> transportFactory(new TBufferedTransportFactory());
+  ::apache::thrift::stdcxx::shared_ptr<TProtocolFactory> protocolFactory(new TBinaryProtocolFactory());
+
+  TSimpleServer server(processor, serverTransport, transportFactory, protocolFactory);
+  server.serve();
+  return 0;
+}
+

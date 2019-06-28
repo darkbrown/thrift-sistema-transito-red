@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #ECECEC;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cliente_transitoController.AdministrarVehiculoController">
+   <children>
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="64.0" layoutY="-2.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="600.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+      <Button fx:id="btnAceptar" layoutX="200.0" layoutY="358.0" mnemonicParsing="false" onAction="#aceptarAccion" prefHeight="26.0" prefWidth="71.0" style="-fx-background-color: linear-gradient(#24305E 40%, #0c1021 100%);" text="Aceptar" textAlignment="CENTER" textFill="WHITE" AnchorPane.leftAnchor="200.0" />
+      <Label layoutX="14.0" layoutY="14.0" prefHeight="35.0" prefWidth="229.0" text="Vehiculo" textAlignment="CENTER" textFill="#f3d250" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="357.0" AnchorPane.topAnchor="14.0">
+         <font>
+            <Font name="System Bold" size="24.0" />
+         </font>
+      </Label>
+      <Button fx:id="btnRegresar" cancelButton="true" layoutX="307.0" layoutY="358.0" mnemonicParsing="false" onAction="#regresarMenuPral" prefHeight="26.0" prefWidth="77.0" style="-fx-background-color: linear-gradient(#F76C6C 40%, #b74e4e 100%);" text="Regresar" textAlignment="CENTER" textFill="WHITE" />
+      <GridPane layoutX="14.0" layoutY="93.0" prefHeight="280.0" prefWidth="573.0">
+        <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="219.0" minWidth="10.0" prefWidth="177.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="185.0" minWidth="10.0" prefWidth="21.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="380.0" minWidth="10.0" prefWidth="375.0" />
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <Label prefHeight="35.0" prefWidth="100.0" text="Marca" textFill="#9b786f" />
+            <Label text="Numero de placas" textFill="#9b786f" GridPane.rowIndex="8" />
+            <Label text="Nombre de aseguradora" textFill="#9b786f" GridPane.rowIndex="12">
+               <font>
+                  <Font name="System Italic" size="12.0" />
+               </font></Label>
+            <Label text="Color" textFill="#9b786f" GridPane.rowIndex="6" />
+            <Label text="Modelo" textFill="#9b786f" GridPane.rowIndex="2" />
+            <Label text="Año" textFill="#9b786f" GridPane.rowIndex="4" />
+            <Label text="Número de póliza de seguro" textFill="#9b786f" GridPane.rowIndex="10">
+               <font>
+                  <Font name="System Italic" size="12.0" />
+               </font></Label>
+            <Label text="(opcional)" textFill="#9b786f" GridPane.rowIndex="9">
+               <font>
+                  <Font name="System Italic" size="12.0" />
+               </font>
+            </Label>
+            <Label text="(opcional)" textFill="#9b786f" GridPane.rowIndex="11">
+               <font>
+                  <Font name="System Italic" size="12.0" />
+               </font>
+            </Label>
+            <TextField fx:id="tfMarca" editable="false" visible="false" GridPane.columnIndex="2" />
+            <TextField fx:id="tfNAseguradora" editable="false" visible="false" GridPane.columnIndex="2" GridPane.rowIndex="12" />
+            <TextField fx:id="tfNPSeguro" editable="false" visible="false" GridPane.columnIndex="2" GridPane.rowIndex="10" />
+            <TextField fx:id="tfNplacas" editable="false" visible="false" GridPane.columnIndex="2" GridPane.rowIndex="8" />
+            <TextField fx:id="tfColor" editable="false" visible="false" GridPane.columnIndex="2" GridPane.rowIndex="6" />
+            <TextField fx:id="tfModelo" editable="false" visible="false" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+            <TextField fx:id="tfAno" editable="false" visible="false" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+            <Label fx:id="lblMarca" prefHeight="30.0" prefWidth="675.0" text="" GridPane.columnIndex="2" />
+            <Label fx:id="lblModelo" prefHeight="30.0" prefWidth="715.0" text="" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+            <Label fx:id="lblAno" prefHeight="30.0" prefWidth="712.0" text="" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+            <Label fx:id="lblNplacas" prefHeight="30.0" prefWidth="713.0" text="" GridPane.columnIndex="2" GridPane.rowIndex="8" />
+            <Label fx:id="lblColor" prefHeight="30.0" prefWidth="719.0" text="" GridPane.columnIndex="2" GridPane.rowIndex="6" />
+            <Label fx:id="lblNPSeguro" prefHeight="30.0" prefWidth="712.0" text="" GridPane.columnIndex="2" GridPane.rowIndex="10" />
+            <Label fx:id="lblNAseguradora" prefHeight="30.0" prefWidth="717.0" text="" GridPane.columnIndex="2" GridPane.rowIndex="12" />
+         </children>
+      </GridPane>
+      <ToolBar layoutX="143.0" layoutY="5.0" prefHeight="40.0" prefWidth="200.0" style="-fx-background-color: white;">
+         <items>
+            <Button fx:id="btnRegistrar" layoutX="62.0" layoutY="5.0" mnemonicParsing="false" onAction="#mostrarRegistrar" prefHeight="5.0" prefWidth="33.0">
+               <graphic>
+                  <ImageView fitHeight="32.0" fitWidth="53.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../recursos_Imagen/IconoRegistrar.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+               <tooltip>
+                  <Tooltip style="-fx-font-size: 12; -fx-background-color: #9b786f;" text="Registrar vehículo" />
+               </tooltip>
+            </Button>
+            <Button fx:id="btnModificar" mnemonicParsing="false" onAction="#mostrarModificar" prefHeight="5.0" prefWidth="33.0">
+               <graphic>
+                  <ImageView fitHeight="32.0" fitWidth="53.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../recursos_Imagen/IconoAjustes.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+               <tooltip>
+                  <Tooltip style="-fx-background-color: white; -fx-font-size: 12; -fx-text-fill: #9b786f;" text="Modificar vehiculo" wrapText="true" />
+               </tooltip>
+            </Button>
+            <Button fx:id="btnDeshabilitar" mnemonicParsing="false" onAction="#mostrarDeshabilitar" prefHeight="5.0" prefWidth="33.0">
+               <graphic>
+                  <ImageView fitHeight="32.0" fitWidth="53.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../recursos_Imagen/IconoEliminar.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+               <tooltip>
+                  <Tooltip style="-fx-background-color: #9b786f; -fx-font-size: 12;" text="Deshabilitar vehiculo" />
+               </tooltip>
+            </Button>
+         </items>
+      </ToolBar>
+      <TitledPane fx:id="tpEncabezadoOpcion" animated="false" collapsible="false" layoutX="1.0" layoutY="50.0" mouseTransparent="true" prefHeight="4.0" prefWidth="600.0" text="Datos actuales" />
+      <AnchorPane fx:id="apSelecVehiculo" layoutX="-2.0" layoutY="51.0" prefHeight="309.0" prefWidth="603.0" style="-fx-background-color: #ECECEC;">
+         <children>
+            <MenuButton fx:id="mbSelecVehiculo" layoutX="189.0" layoutY="74.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="207.0" text="Vehiculos">
+              <items>
+                <MenuItem mnemonicParsing="false">
+                     <graphic>
+                        <CheckBox fx:id="cbNoVehiculo" mnemonicParsing="false" text="No tengo vehiculo registrado" />
+                     </graphic>
+                  </MenuItem>
+              </items>
+            </MenuButton>
+         </children>
+      </AnchorPane>
+      <Label fx:id="lblSelecVehiculo" layoutX="8.0" layoutY="57.0" prefHeight="53.0" prefWidth="584.0" text="Por favor selecciona uno de tus vehículos o la primera opción si no tienes ninguno registrado y después presiona Aceptar" textFill="#9b786f" wrapText="true">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <Rectangle fx:id="rDeshabilitarVehiculo" arcHeight="5.0" arcWidth="5.0" fill="#ececec" height="309.0" layoutX="-27.0" layoutY="50.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" visible="false" width="653.0" />
+      <Label fx:id="lblConfDeshabilitar" alignment="CENTER" contentDisplay="CENTER" layoutX="-125.0" layoutY="180.0" prefHeight="40.0" prefWidth="852.0" text="¿Está seguro de eliminar su vehiculo?" textAlignment="CENTER" textFill="#f76c6c" visible="false">
+         <font>
+            <Font size="28.0" />
+         </font>
+      </Label>
+   </children>
+</AnchorPane>

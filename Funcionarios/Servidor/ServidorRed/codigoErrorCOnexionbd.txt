@@ -1,0 +1,9 @@
+if (!model.lastError().isValid()){
+    respuesta.estatus = 0;
+
+}else{
+    qDebug() << "Imprimiendo el error";
+    qDebug() << model.lastError();
+    respuesta.estatus = 1;
+    return respuesta;
+}

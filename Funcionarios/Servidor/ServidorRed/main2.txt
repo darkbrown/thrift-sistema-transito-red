@@ -1,0 +1,524 @@
+#include "ApiServidor.h"
+#include <thrift/protocol/TBinaryProtocol.h>
+#include <thrift/server/TSimpleServer.h>
+#include <thrift/transport/TServerSocket.h>
+#include <thrift/transport/TBufferTransports.h>
+#include <iostream>
+
+#include <QCoreApplication>
+#include <QtSql>
+#include <iostream>
+#include <QSqlDatabase>
+#include <QSqlTableModel>
+#include <QString>
+#include <QSqlError>
+#include <QtSql>
+#include <qsqldatabase.h>
+#include <QDir>
+#include <sstream>
+#include <string>
+
+using namespace ::apache::thrift;
+using namespace ::apache::thrift::protocol;
+using namespace ::apache::thrift::transport;
+using namespace ::apache::thrift::server;
+
+using namespace std;
+
+using namespace  ::Thrift;
+
+class ApiServidorHandler : virtual public ApiServidorIf {
+public:
+    ApiServidorHandler() {
+        // Your initialization goes here
+    }
+
+    bool confirmarConductor(const int64_t telefono, const std::string& contrasena) {
+
+        QSqlTableModel model;
+        model.setTable("conductor");
+        stringstream appendStatement;
+        QString statement;
+
+        appendStatement << "telefono = " << std::to_string(telefono);
+        statement = QString::fromStdString(appendStatement.str());
+        model.setFilter(statement);
+        model.select();
+
+        QString consultaUsuario = model.record(0).value("telefono").toString();
+
+        appendStatement.str("");
+        appendStatement << "contrasena = " << "'" << contrasena << "'";
+        statement = QString::fromStdString(appendStatement.str());
+        model.setFilter(statement);
+        model.select();
+
+        QString consultaContrasena = model.record(0).value("contrasena").toString();
+
+        if(consultaUsuario.size() == 0 || consultaContrasena.size() == 0){
+            cout << "<<Intento de inicio de sesion fallido>>" << endl;
+            return false;
+        } else {
+            cout << "<<Inicio de sesion exitoso>>" << endl;
+            return true;
+        }
+    }
+
+    bool registrarConductor(const Conductor& conductor) {
+
+        QSqlTableModel model;
+        unsigned long long telefono = conductor.telefono;
+        unsigned long long numLicencia = conductor.numLicencia;
+        model.setTable("conductor");
+        QSqlRecord record = model.record();
+
+        record.remove(record.indexOf("idconductor"));
+        record.setValue("curp", QString::fromStdString(conductor.curp));
+        record.setValue("fechaNac", QString::fromStdString(conductor.fechaNac));
+        record.setValue("nombreComp", QString::fromStdString(conductor.nombreComp));
+        record.setValue("numLicencia", numLicencia);
+        record.setValue("telefono", telefono);
+        record.setValue("estatus", 0);
+        record.setValue("contrasena", QString::fromStdString(conductor.contrasena));
+        if(model.insertRecord(-1, record)){
+
+            cout << "<<Insercion exitosa>>" <<endl;
+            model.submitAll();
+            return true;
+        } else {
+
+            cout << "<<Insercion inexitosa>>" <<endl;
+            return false;
+        }
+    }
+
+    bool registrarVehiculo(const Vehiculo& vehiculo, const int64_t telefono) {
+
+        QSqlTableModel model;
+        model.setTable("vehiculo");
+        QSqlRecord record = model.record();
+        record.remove(record.indexOf("idvehiculo"));
+        record.setValue("ano", vehiculo.ano);
+        record.setValue("color", QString::fromStdString(vehiculo.color));
+        record.setValue("marca", QString::fromStdString(vehiculo.marca));
+        record.setValue("modelo", QString::fromStdString(vehiculo.modelo));
+        record.setValue("numPlaca", QString::fromStdString(vehiculo.numPlaca));
+        record.setValue("numPoliza", QString::fromStdString(vehiculo.numPoliza));
+        record.setValue("nomAseguradora", QString::fromStdString(vehiculo.nomAseguradora));
+        record.setValue("estatus", vehiculo.estatus);
+        if(model.insertRecord(-1, record)){
+
+            cout << "<<Insercion vehiculo exitosa>>" <<endl;
+            model.submitAll();
+        } else {
+
+            cout << "<<Insercion vehiculo inexitosa>>" <<endl;
+            return false;
+        }
+
+        stringstream appendStatement;
+        QString statement;
+        appendStatement << "numPlaca = " << "'" << vehiculo.numPlaca << "'";
+        statement = QString::fromStdString(appendStatement.str());
+        model.setFilter(statement);
+        model.select();
+        int idvehiculo = model.record(0).value("idvehiculo").toInt();
+
+        model.setTable("conductor");
+        appendStatement.str("");
+        appendStatement << "telefono = " << std::to_string(telefono);
+        statement = QString::fromStdString(appendStatement.str());
+        model.setFilter(statement);
+        model.select();
+        int idconductor = model.record(0).value("idconductor").toInt();
+
+        model.setTable("conductor_vehiculo");
+        record = model.record();
+        record.setValue("idvehiculo", idvehiculo);
+        record.setValue("idconductor", idconductor);
+        if(model.insertRecord(-1, record)){
+
+            cout << "<<Insercion relacion exitosa>>" <<endl;
+            model.submitAll();
+            return true;
+        } else {
+
+            cout << "<<Insercion relacion inexitosa>>" <<endl;
+            model.setTable("vehiculo");
+            appendStatement.str("");
+            appendStatement << "idvehiculo = " << std::to_string(idvehiculo);
+            statement = QString::fromStdString(appendStatement.str());
+            model.setFilter(statement);
+            model.select();
+            model.removeRows(0, 1);
+
+            model.submitAll();
+            return false;
+        }
+    }
+
+    bool modificarVehiculo(const Vehiculo& vehiculo, const std::string& numPLacaAnt) {
+
+        QSqlTableModel model;
+        model.setTable("vehiculo");
+        stringstream appendStatement;
+        QString statement;
+        appendStatement << "numPlaca = " << "'" << numPLacaAnt << "'";
+        statement = QString::fromStdString(appendStatement.str());
+        model.setFilter(statement);
+        model.select();
+
+        QSqlRecord record = model.record(0);
+        record.setValue("ano", vehiculo.ano);
+        record.setValue("color", QString::fromStdString(vehiculo.color));
+        record.setValue("marca", QString::fromStdString(vehiculo.marca));
+        record.setValue("modelo", QString::fromStdString(vehiculo.modelo));
+        record.setValue("numPlaca", QString::fromStdString(vehiculo.numPlaca));
+        record.setValue("numPoliza", QString::fromStdString(vehiculo.numPoliza));
+        record.setValue("nomAseguradora", QString::fromStdString(vehiculo.nomAseguradora));
+        record.setValue("estatus", vehiculo.estatus);
+        model.setRecord(0, record);
+        if(model.submitAll()){
+
+            return true;
+        } else {
+
+            return true;
+        }
+    }
+
+    bool deshabilitarVehiculo(const std::string& numPlaca) {
+
+        QSqlTableModel model;
+        model.setTable("vehiculo");
+        stringstream appendStatement;
+        QString statement;
+        appendStatement << "numPlaca = " << "'" << numPlaca << "'";
+        statement = QString::fromStdString(appendStatement.str());
+        model.setFilter(statement);
+        model.select();
+
+        QSqlRecord record = model.record(0);
+        record.setValue("estatus", 1);
+        model.setRecord(0, record);
+        if(model.submitAll()){
+
+            return true;
+        } else {
+
+            return true;
+        }
+    }
+
+    void consultarVehiculoPropio(std::vector<Vehiculo> & _return, const int64_t telefono) {
+
+        QSqlTableModel model;
+        model.setTable("conductor");
+        stringstream appendStatement;
+        QString statement;
+        appendStatement << "telefono = " << std::to_string(telefono);
+        statement = QString::fromStdString(appendStatement.str());
+        model.setFilter(statement);
+        model.select();
+        int idconductor = model.record(0).value("idconductor").toInt();
+
+        model.setTable("conductor_vehiculo");
+        appendStatement.str("");
+        appendStatement << "idconductor = " << std::to_string(idconductor);
+        statement = QString::fromStdString(appendStatement.str());
+        model.setFilter(statement);
+        model.select();
+
+        QSqlTableModel modelVehiculo;
+        modelVehiculo.setTable("vehiculo");
+        Vehiculo vehiculoRecuperado;
+        for (int i = 0; i < model.rowCount(); ++i) {
+
+            int idvehiculo = model.record(i).value("idvehiculo").toInt();
+            appendStatement.str("");
+            appendStatement << "idvehiculo = " << std::to_string(idvehiculo);
+            statement = QString::fromStdString(appendStatement.str());
+            modelVehiculo.setFilter(statement);
+            modelVehiculo.select();
+            int estatus = modelVehiculo.record(0).value("estatus").toInt();
+            if(estatus == 0){
+
+                vehiculoRecuperado.__set_ano(modelVehiculo.record(0).value("ano").toInt());
+                vehiculoRecuperado.__set_modelo(modelVehiculo.record(0).value("modelo").toString().toUtf8().constData());
+                vehiculoRecuperado.__set_numPlaca(modelVehiculo.record(0).value("numPlaca").toString().toUtf8().constData());
+                _return.push_back(vehiculoRecuperado);
+            }
+        }
+    }
+
+    void consultarVehiculoInfo(Vehiculo& _return, const std::string& numPlaca) {
+
+        QSqlTableModel model;
+        model.setTable("vehiculo");
+        stringstream appendStatement;
+        QString statement;
+        appendStatement << "numPlaca = " << "'" << numPlaca << "'";
+        statement = QString::fromStdString(appendStatement.str());
+        model.setFilter(statement);
+        model.select();
+
+        _return.__set_ano(model.record(0).value("ano").toInt());
+        _return.__set_color(model.record(0).value("color").toString().toUtf8().constData());
+        _return.__set_marca(model.record(0).value("marca").toString().toUtf8().constData());
+        _return.__set_modelo(model.record(0).value("modelo").toString().toUtf8().constData());
+        _return.__set_numPlaca(model.record(0).value("numPlaca").toString().toUtf8().constData());
+        _return.__set_estatus(model.record(0).value("estatus").toInt());
+        _return.__set_numPoliza(model.record(0).value("numPaliza").toString().toUtf8().constData());
+        _return.__set_nomAseguradora(model.record(0).value("nomAseguradora").toString().toUtf8().constData());
+    }
+
+    bool registrarReporte(const Reporte& reporte, const int64_t telefono, const std::vector<std::string> & numPLacas) {
+
+        QSqlTableModel model;
+        model.setTable("conductor");
+        stringstream appendStatement;
+        QString statement;
+        appendStatement << "telefono = " << std::to_string(telefono);
+        statement = QString::fromStdString(appendStatement.str());
+        model.setFilter(statement);
+        model.select();
+        int idconductor = model.record(0).value("idconductor").toInt();
+
+        model.setTable("reporte");
+        QSqlRecord record = model.record();
+        record.remove(record.indexOf("idreporte"));
+        record.setValue("latitud", QString::fromStdString(reporte.latitud));
+        record.setValue("longitud", QString::fromStdString(reporte.longitud));
+        record.setValue("nombreOtroConduc", QString::fromStdString(reporte.nombreOtroConduc));
+        record.setValue("idconductor", idconductor);
+        if(model.insertRecord(-1, record)){
+
+            cout << "<<Insercion reporte exitosa>>" <<endl;
+            model.submitAll();
+        } else {
+
+            cout << "<<Insercion reporte inexitosa>>" <<endl;
+        }
+
+        model.setTable("reporte");
+        appendStatement.str("");
+        appendStatement << "idconductor = " << std::to_string(idconductor);
+        statement = QString::fromStdString(appendStatement.str());
+        model.setFilter(statement);
+        model.select();
+        int idreporte;
+        for (int i = 0; i < model.rowCount(); ++i) {
+
+            idreporte = model.record(i).value("idreporte").toInt();
+        }
+
+        bool exito = true;
+        for(int i = 0; i < 2; i++){
+
+            model.setTable("vehiculo");
+            appendStatement.str("");
+            appendStatement << "numPlaca = " << "'" << numPLacas[i] << "'";
+            statement = QString::fromStdString(appendStatement.str());
+            model.setFilter(statement);
+            model.select();
+            int idvehiculo = model.record(0).value("idvehiculo").toInt();
+            model.setTable("vehiculo_reporte");
+            record = model.record();
+            record.setValue("idreporte", idreporte);
+            record.setValue("idvehiculo", idvehiculo);
+            if(model.insertRecord(-1, record)){
+
+                cout << "<<Insercion vehiculo_reporte exitosa>>" <<endl;
+                model.submitAll();
+            } else {
+
+                cout << "<<Insercion vehiculo_reporte inexitosa>>" <<endl;
+                return false;
+            }
+        }
+        return exito;
+    }
+
+    bool registrarFotografias(const std::vector<std::string> & fotografias, const int64_t telefono) {
+
+        QSqlTableModel model;
+        model.setTable("conductor");
+        stringstream appendStatement;
+        QString statement;
+        appendStatement << "telefono = " << std::to_string(telefono);
+        statement = QString::fromStdString(appendStatement.str());
+        model.setFilter(statement);
+        model.select();
+        int idconductor = model.record(0).value("idconductor").toInt();
+
+        model.setTable("reporte");
+        appendStatement.str("");
+        appendStatement << "idconductor = " << std::to_string(idconductor);
+        statement = QString::fromStdString(appendStatement.str());
+        model.setFilter(statement);
+        model.select();
+        int idreporte = model.record(0).value("idreporte").toInt();
+
+        model.setTable("fotografia_reporte");
+        QSqlRecord record = model.record();
+        bool exito = true;
+        for(int i = 0; i < fotografias.size(); i++){
+            record.setValue("idreporte",idreporte);
+            record.setValue("fotografia", QString::fromStdString(fotografias[i]));
+            cout << "esto llego: " << fotografias[i];
+            if(model.insertRecord(-1, record)){
+
+                cout << "<<Insercion exitosa>>" <<endl;
+                model.submitAll();
+            } else {
+
+                cout << "<<Insercion inexitosa>>" <<endl;
+                return false;
+            }
+        }
+        return exito;
+    }
+
+    bool registrarFotografia(const std::vector<std::string> & fotografias, const int64_t telefono) {
+      // Your implementation goes here
+      printf("registrarFotografia\n");
+    }
+
+    void consultarFotografias(std::vector<std::string> & _return, const int32_t folioUnico_dictamen) {
+      // Your implementation goes here
+      printf("consultarFotografias\n");
+    }
+
+    void consultarFotografia(std::vector<std::string> & _return, const int32_t folioUnico_dictamen) {
+      // Your implementation goes here
+      printf("consultarFotografia\n");
+    }
+
+    bool registrarVehiculoReporte(const Vehiculo& vehiculo) {
+
+        QSqlTableModel model;
+        model.setTable("vehiculo");
+        QSqlRecord record = model.record();
+        record.remove(record.indexOf("idvehiculo"));
+        record.setValue("ano", vehiculo.ano);
+        record.setValue("color", QString::fromStdString(vehiculo.color));
+        record.setValue("marca", QString::fromStdString(vehiculo.marca));
+        record.setValue("modelo", QString::fromStdString(vehiculo.modelo));
+        record.setValue("numPlaca", QString::fromStdString(vehiculo.numPlaca));
+        record.setValue("numPoliza", QString::fromStdString(vehiculo.numPoliza));
+        record.setValue("nomAseguradora", QString::fromStdString(vehiculo.nomAseguradora));
+        record.setValue("estatus", vehiculo.estatus);
+        if(model.insertRecord(-1, record)){
+
+            cout << "<<Insercion vehiculo exitosa>>" <<endl;
+            model.submitAll();
+            return true;
+        } else {
+
+            cout << "<<Insercion vehiculo inexitosa>>" <<endl;
+            return false;
+        }
+    }
+
+    void consultarReporte(std::vector<Reporte> & _return, const int64_t telefono) {
+
+        QSqlTableModel model;
+        Reporte reporteRecuperado;
+        model.setTable("conductor");
+        stringstream appendStatement;
+        QString statement;
+        appendStatement << "telefono = " << std::to_string(telefono);
+        statement = QString::fromStdString(appendStatement.str());
+        model.setFilter(statement);
+        model.select();
+        int idconductor = model.record(0).value("idconductor").toInt();
+
+        model.setTable("reporte");
+        appendStatement.str("");
+        appendStatement << "idconductor = " << std::to_string(idconductor);
+        statement = QString::fromStdString(appendStatement.str());
+        model.setFilter(statement);
+        model.select();
+        for (int i = 0; i < model.rowCount(); ++i) {
+
+            reporteRecuperado.__set_latitud(model.record(i).value("latitud").toString().toUtf8().constData());
+            reporteRecuperado.__set_longitud(model.record(i).value("longitud").toString().toUtf8().constData());
+            reporteRecuperado.__set_nombreOtroConduc(model.record(i).value("nombreOtroConduc").toString().toUtf8().constData());
+            reporteRecuperado.__set_idconductor(model.record(i).value("idconductor").toInt());
+            reporteRecuperado.__set_folioUnico_dictamen(model.record(i).value("folioUnico_dictamen").toInt());
+            //cout << "el conductor: " << model.record(i).value("idconductor").toInt() << endl;
+            //cout << model.record(i).value("folioUnico_dictamen").toInt() << endl;
+            _return.push_back(reporteRecuperado);
+        }
+    }
+
+    void consultarDictamen(std::vector<Dictamen> & _return, const std::vector<int32_t> & folioUnico) {
+
+        QSqlTableModel model;
+        Dictamen dictamenRecuperado;
+        model.setTable("dictamen");
+        stringstream appendStatement;
+        QString statement;
+        list <int> :: iterator it;
+        for(int i = 0; i < folioUnico.size(); i++){
+
+            appendStatement << "folioUnico = " << std::to_string(folioUnico[i]);
+            //cout << "folio unico: " << folioUnico[i];
+            statement = QString::fromStdString(appendStatement.str());
+            model.setFilter(statement);
+            model.select();
+            dictamenRecuperado.__set_folioUnico(model.record(0).value("folioUnico").toInt());
+            dictamenRecuperado.__set_fechaHora(model.record(0).value("fechaHora").toDateTime().toString().toUtf8().constData());
+            dictamenRecuperado.__set_dictamen(model.record(0).value("dictamen").toString().toUtf8().constData());
+            dictamenRecuperado.__set_idReporte(model.record(0).value("idReporte").toInt());
+            dictamenRecuperado.__set_idFuncionario(model.record(0).value("idFuncionario").toInt());
+            _return.push_back(dictamenRecuperado);
+
+        }
+    }
+
+    void consultarConductorPropio(Conductor& _return, const int64_t telefono) {
+
+        QSqlTableModel model;
+        model.setTable("conductor");
+        stringstream appendStatement;
+        QString statement;
+        appendStatement << "telefono = " << std::to_string(telefono);
+        statement = QString::fromStdString(appendStatement.str());
+        model.setFilter(statement);
+        model.select();
+
+        _return.__set_curp(model.record(0).value("curp").toString().toUtf8().constData());
+        _return.__set_fechaNac(model.record(0).value("fechaNac").toDate().toString().toUtf8().constData());
+        _return.__set_telefono(model.record(0).value("telefono").toLongLong());
+        _return.__set_nombreComp(model.record(0).value("nombreComp").toString().toUtf8().constData());
+        _return.__set_numLicencia(model.record(0).value("numLicencia").toLongLong());
+    }
+
+};
+
+int main(int argc, char **argv) {
+
+    int port = 9090;
+    cout << "<<El servidor esta corriendo>>" << endl;
+    ::apache::thrift::stdcxx::shared_ptr<ApiServidorHandler> handler(new ApiServidorHandler());
+    ::apache::thrift::stdcxx::shared_ptr<TProcessor> processor(new ApiServidorProcessor(handler));
+    ::apache::thrift::stdcxx::shared_ptr<TServerTransport> serverTransport(new TServerSocket(port));
+    ::apache::thrift::stdcxx::shared_ptr<TTransportFactory> transportFactory(new TBufferedTransportFactory());
+    ::apache::thrift::stdcxx::shared_ptr<TProtocolFactory> protocolFactory(new TBinaryProtocolFactory());
+
+    TSimpleServer server(processor, serverTransport, transportFactory, protocolFactory);
+    QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
+    db.setHostName("localhost");
+    db.setPort(3306);
+    db.setDatabaseName("sistema_transito");
+    db.setUserName("administrador");
+    db.setPassword("admi-S1s");
+
+    if(!db.open()){
+        cout << db.lastError().text().toUtf8().constData() << endl;
+    }
+    server.serve();
+
+    return 0;
+}

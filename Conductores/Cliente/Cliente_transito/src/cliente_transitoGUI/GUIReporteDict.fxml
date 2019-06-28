@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #ECECEC;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cliente_transitoController.ReporteDictController">
+   <children>
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="64.0" layoutY="-2.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="600.0" />
+      <Label layoutX="14.0" layoutY="14.0" prefHeight="35.0" prefWidth="274.0" text="Dictaminar reporte" textAlignment="CENTER" textFill="#f3d250" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="312.0" AnchorPane.topAnchor="14.0">
+         <font>
+            <Font name="System Bold" size="24.0" />
+         </font>
+      </Label>
+      <Button fx:id="btnRegresar" cancelButton="true" layoutX="269.0" layoutY="361.0" mnemonicParsing="false" onAction="#regresarConsultaReportes" style="-fx-background-color: linear-gradient(#F76C6C 40%, #b74e4e 100%);" text="Regresar" textAlignment="CENTER" textFill="WHITE" />
+      <TitledPane animated="false" collapsible="false" layoutX="14.0" layoutY="215.0" prefHeight="152.0" prefWidth="573.0" style="-fx-border-color: black; -fx-background-color: transparent;" text="Dictamen" />
+      <TitledPane animated="false" collapsible="false" layoutX="407.0" layoutY="241.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="47.0" prefWidth="175.0" text="Fecha">
+         <content>
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="0.0" prefWidth="220.0">
+               <children>
+                  <Label fx:id="lblFecha" layoutX="6.0" layoutY="2.0" text="00/00/0000 00:00" />
+               </children>
+            </AnchorPane>
+         </content>
+      </TitledPane>
+      <TitledPane animated="false" collapsible="false" layoutX="213.0" layoutY="241.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="47.0" prefWidth="175.0" text="Nombre perito">
+         <content>
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="0.0" prefWidth="220.0">
+               <children>
+                  <Label fx:id="lblNPerito" layoutX="6.0" layoutY="2.0" text="NombrePerito ApellidosPerito" />
+               </children>
+            </AnchorPane>
+         </content>
+      </TitledPane>
+      <TitledPane animated="false" collapsible="false" layoutX="18.0" layoutY="241.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="47.0" prefWidth="175.0" text="Folio de dictamen">
+         <content>
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="0.0" prefWidth="220.0">
+               <children>
+                  <Label fx:id="lblFUnico" layoutX="6.0" layoutY="2.0" prefHeight="16.0" prefWidth="165.0" text="01234" />
+               </children>
+            </AnchorPane>
+         </content>
+      </TitledPane>
+      <TitledPane animated="false" collapsible="false" layoutX="18.0" layoutY="290.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="74.0" prefWidth="563.0" text="Descripción">
+         <content>
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="21.0" prefWidth="467.0">
+               <children>
+                  <ScrollPane prefHeight="53.0" prefWidth="563.0">
+                    <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="575.0">
+                           <children>
+                              <Label fx:id="lblDescripcion" alignment="TOP_LEFT" prefHeight="223.0" prefWidth="562.0" text="888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888" wrapText="true" />
+                           </children>
+                        </AnchorPane>
+                    </content>
+                  </ScrollPane>
+               </children>
+            </AnchorPane>
+         </content>
+      </TitledPane>
+      <TitledPane animated="false" collapsible="false" layoutX="14.0" layoutY="71.0" prefHeight="144.0" prefWidth="573.0" style="-fx-border-color: black;" text="Reporte">
+         <content>
+            <ScrollPane prefHeight="414.0" prefWidth="569.0">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="423.0" prefWidth="568.0">
+                     <children>
+                        <GridPane layoutX="1.0" prefHeight="400.0" prefWidth="568.0" AnchorPane.bottomAnchor="-42.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                          <columnConstraints>
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="142.0" minWidth="10.0" prefWidth="132.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="73.0" minWidth="0.0" prefWidth="0.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="85.0" minWidth="10.0" prefWidth="68.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                          </columnConstraints>
+                          <rowConstraints>
+                              <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
+                              <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+                              <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
+                              <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+                              <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
+                              <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+                            <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
+                            <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+                            <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
+                              <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+                              <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
+                              <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+                              <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
+                              <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+                              <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                          </rowConstraints>
+                           <children>
+                              <Label prefHeight="28.0" prefWidth="199.0" text="Nombre conductor" textFill="#9b786f" />
+                              <Label prefHeight="16.0" prefWidth="180.0" text="Longitud" textFill="#9b786f" GridPane.rowIndex="12" />
+                              <Label text="Año vehiculo" textFill="#9b786f" GridPane.rowIndex="6" />
+                              <Label text="Marca vehiculo" textFill="#9b786f" GridPane.rowIndex="2" />
+                              <Label text="Modelo vehiculo" textFill="#9b786f" GridPane.rowIndex="4" />
+                              <Label fx:id="lblNombre1" prefHeight="20.0" prefWidth="209.0" style="-fx-background-color: #ECECEC; -fx-border-color: #ECECEC #ECECEC #9b786f #ECECEC;" text="Nombre del conductor" textFill="#9b786f" GridPane.columnIndex="2" GridPane.columnSpan="2" />
+                              <Label fx:id="lblNombre2" prefHeight="20.0" prefWidth="289.0" style="-fx-background-color: #ECECEC; -fx-border-color: #ECECEC #ECECEC #9b786f #ECECEC;" textFill="#9b786f" GridPane.columnIndex="5" GridPane.columnSpan="2" />
+                              <Label text="Latitud" textFill="#9b786f" GridPane.columnIndex="4" GridPane.rowIndex="12" />
+                              <Label fx:id="blbLatitud" prefHeight="30.0" prefWidth="169.0" style="-fx-background-color: #ECECEC; -fx-border-color: #ECECEC #ECECEC #9b786f #ECECEC;" text="Nombre del conductor" textFill="#9b786f" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="12" />
+                              <Label text="Color vehiculo" textFill="#9b786f" GridPane.rowIndex="8" />
+                              <Label text="Num placas vehiculo" textFill="#9b786f" GridPane.rowIndex="10" />
+                              <ImageView fx:id="ivFtotografia2" fitHeight="64.0" fitWidth="183.0" layoutX="10.0" layoutY="276.0" pickOnBounds="true" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.rowIndex="14" GridPane.rowSpan="2" />
+                              <ImageView fx:id="ivFtotografia3" fitHeight="56.0" fitWidth="181.0" pickOnBounds="true" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="14" GridPane.rowSpan="2" />
+                              <ImageView fx:id="ivFtotografia4" fitHeight="56.0" fitWidth="208.0" pickOnBounds="true" GridPane.columnSpan="2" GridPane.rowIndex="16" GridPane.rowSpan="2" />
+                              <ImageView fx:id="ivFtotografia5" fitHeight="56.0" fitWidth="183.0" pickOnBounds="true" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.rowIndex="16" GridPane.rowSpan="2" />
+                              <ImageView fx:id="ivFtotografia6" fitHeight="56.0" fitWidth="181.0" pickOnBounds="true" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="16" GridPane.rowSpan="2" />
+                              <ImageView fx:id="ivFtotografia7" fitHeight="56.0" fitWidth="208.0" pickOnBounds="true" GridPane.columnSpan="2" GridPane.rowIndex="18" GridPane.rowSpan="2" />
+                              <ImageView fx:id="ivFtotografia8" fitHeight="56.0" fitWidth="182.0" pickOnBounds="true" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.rowIndex="18" GridPane.rowSpan="2" />
+                              <ImageView fx:id="ivFtotografia1" fitHeight="56.0" fitWidth="208.0" pickOnBounds="true" GridPane.columnSpan="2" GridPane.rowIndex="14" GridPane.rowSpan="2" />
+                              <Label fx:id="lblMarca1" prefHeight="20.0" prefWidth="209.0" style="-fx-background-color: #ECECEC; -fx-border-color: #ECECEC #ECECEC #9b786f #ECECEC;" text="Nombre del conductor" textFill="#9b786f" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                              <Label fx:id="lblMarca2" prefHeight="20.0" prefWidth="209.0" style="-fx-background-color: #ECECEC; -fx-border-color: #ECECEC #ECECEC #9b786f #ECECEC;" textFill="#9b786f" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                              <Label fx:id="lblModelo1" prefHeight="20.0" prefWidth="209.0" style="-fx-background-color: #ECECEC; -fx-border-color: #ECECEC #ECECEC #9b786f #ECECEC;" text="Nombre del conductor" textFill="#9b786f" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="4" />
+                              <Label fx:id="lblModelo2" prefHeight="20.0" prefWidth="209.0" style="-fx-background-color: #ECECEC; -fx-border-color: #ECECEC #ECECEC #9b786f #ECECEC;" textFill="#9b786f" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="4" />
+                              <Label fx:id="lblAno1" prefHeight="20.0" prefWidth="209.0" style="-fx-background-color: #ECECEC; -fx-border-color: #ECECEC #ECECEC #9b786f #ECECEC;" text="Nombre del conductor" textFill="#9b786f" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="6" />
+                              <Label fx:id="lblAno2" prefHeight="20.0" prefWidth="209.0" style="-fx-background-color: #ECECEC; -fx-border-color: #ECECEC #ECECEC #9b786f #ECECEC;" textFill="#9b786f" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="6" />
+                              <Label fx:id="lblColor1" prefHeight="20.0" prefWidth="209.0" style="-fx-background-color: #ECECEC; -fx-border-color: #ECECEC #ECECEC #9b786f #ECECEC;" text="Nombre del conductor" textFill="#9b786f" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="8" />
+                              <Label fx:id="lblColor2" prefHeight="20.0" prefWidth="209.0" style="-fx-background-color: #ECECEC; -fx-border-color: #ECECEC #ECECEC #9b786f #ECECEC;" textFill="#9b786f" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="8" />
+                              <Label fx:id="lblNPlaca1" prefHeight="20.0" prefWidth="209.0" style="-fx-background-color: #ECECEC; -fx-border-color: #ECECEC #ECECEC #9b786f #ECECEC;" text="Nombre del conductor" textFill="#9b786f" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="10" />
+                              <Label fx:id="lblNPlaca2" prefHeight="20.0" prefWidth="209.0" style="-fx-background-color: #ECECEC; -fx-border-color: #ECECEC #ECECEC #9b786f #ECECEC;" textFill="#9b786f" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="10" />
+                              <Label fx:id="lblLongitud" prefHeight="20.0" prefWidth="209.0" style="-fx-background-color: #ECECEC; -fx-border-color: #ECECEC #ECECEC #9b786f #ECECEC;" text="Nombre del conductor" textFill="#9b786f" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="12" />
+                           </children>
+                        </GridPane>
+                     </children>
+                  </AnchorPane>
+              </content>
+            </ScrollPane>
+         </content>
+      </TitledPane>
+   </children>
+</AnchorPane>

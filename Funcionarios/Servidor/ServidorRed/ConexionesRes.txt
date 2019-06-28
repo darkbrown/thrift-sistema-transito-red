@@ -1,0 +1,428 @@
+#include "ApiFuncionario_types.h"
+#include "estructuras.cpp"
+#include <QSqlDatabase>
+#include <QDebug>
+#include <iostream>
+#include <QSqlTableModel>
+#include <QSqlQuery>
+#include <QtSql/QSqlRecord>
+#include <QSqlError>
+
+using namespace std;
+using namespace ::Thrift;
+
+
+class ConexionesDB{
+
+    QSqlDatabase db;
+
+public:
+    ConexionesDB(){
+        this->db = QSqlDatabase::addDatabase("QMYSQL");
+        db.setHostName("localhost");
+        db.setDatabaseName("sistema_transito");
+        db.setPort(3306);
+        db.setUserName("root");
+        db.setPassword("12345678");
+    }
+
+    QSqlDatabase abrirConexion(){
+        this->db.open();
+        qDebug() << "Conexion db abierta";
+        return db;
+    }
+
+    void cerrarConexion(){
+        this->db.close();
+        qDebug() << "Conexion db cerrada";
+    }
+
+
+
+    list<FuncionarioDB> getFuncionario(QString usuario){
+        FuncionarioDB funcionario;
+        list<FuncionarioDB> resultado;
+
+
+        QSqlTableModel model;
+        model.setTable("funcionario");
+        model.setFilter("usuario = '" + usuario + "'");
+        model.select();
+
+        if (!model.lastError().isValid()){
+            if(model.rowCount() > 0){
+                QString nombre = model.record(0).value("nombreComp").toString();
+                int estatus = model.record(0).value("estatus").toInt();
+                QString contrasena = model.record(0).value("contrasena").toString();
+                QString cargo = model.record(0).value("cargo").toString();
+
+                funcionario.nombre = nombre;
+                funcionario.cargo = cargo;
+                funcionario.usuario = usuario;
+                funcionario.contrasena = contrasena;
+                funcionario.estatus = estatus;
+                resultado.push_back(funcionario);
+            }
+        }else{
+            qDebug() << "Imprimiendo el error";
+            qDebug() << model.lastError();
+        }
+
+        return resultado;
+
+    }
+
+    bool registrarPerito(FuncionarioDB perito){
+        abrirConexion();
+
+        QSqlTableModel model;
+        model.setTable("funcionario");
+        QSqlRecord record = model.record();
+        record.remove(record.indexOf("idfuncionario"));
+        record.setValue("cargo", perito.cargo);
+        record.setValue("contrasena", perito.contrasena);
+        record.setValue("nombreComp", perito.nombre);
+        record.setValue("estatus", perito.estatus);
+        record.setValue("usuario", perito.usuario);
+
+        if(model.insertRecord(-1, record)){
+            cerrarConexion();
+            model.submitAll();
+            return true;
+        }else{
+            cerrarConexion();
+            return false;
+        }
+
+    }
+
+    vector<FuncionarioDB> getPeritos(){
+        FuncionarioDB funcionario;
+        vector<FuncionarioDB> resultado;
+
+        abrirConexion();
+
+        QSqlTableModel model;
+        model.setTable("funcionario");
+        model.setFilter("cargo = 'PERITO'");
+        model.select();
+
+        for (int i=0; i < model.rowCount() ;i++) {
+            QString nombre = model.record(i).value("nombreComp").toString();
+            int estatus = model.record(i).value("estatus").toInt();
+            QString contrasena = model.record(i).value("contrasena").toString();
+            QString cargo = model.record(i).value("cargo").toString();
+            QString usuario = model.record(i).value("usuario").toString();
+            cerrarConexion();
+
+            funcionario.nombre = nombre;
+            funcionario.cargo = cargo;
+            funcionario.usuario = usuario;
+            funcionario.contrasena = contrasena;
+            funcionario.estatus = estatus;
+            resultado.push_back(funcionario);
+        }
+
+
+        return resultado;
+    }
+
+    bool cambiarEstatusFuncionario(QString usuario){
+
+        QSqlTableModel model;
+        model.setTable("funcionario");
+        model.setFilter("usuario = '" + usuario + "'");
+        model.select();
+
+        QSqlRecord record = model.record(0);
+               int estatus = record.value("estatus").toInt();
+               if(estatus == 1){
+                   estatus = 0;
+                   record.setValue("estatus", estatus);
+                   if(model.setRecord(0, record)){
+                       model.submitAll();
+                       return true;
+                   }else{
+                       return false;
+                   }
+               }else if(estatus == 0){
+                   estatus = 1;
+                   record.setValue("estatus", estatus);
+                   if(model.setRecord(0, record)){
+                       model.submitAll();
+                       return true;
+                   }else{
+                       return false;
+                   }
+               }else{
+                   return false;
+               }
+
+    }
+
+    bool modificarPerito(FuncionarioDB peritoAnterior, FuncionarioDB peritoNuevo){
+        QSqlTableModel model;
+        model.setTable("funcionario");
+        model.setFilter("usuario = '" + peritoAnterior.usuario + "'");
+        model.select();
+        QSqlRecord record = model.record(0);
+        QString usuario = record.value("usuario").toString();
+        QString nombre = record.value("nombreComp").toString();
+        if(usuario != peritoNuevo.usuario){
+            record.setValue("usuario", peritoNuevo.usuario);
+        }
+
+        if(nombre != peritoNuevo.nombre){
+            record.setValue("nombreComp", peritoNuevo.nombre);
+        }
+
+        if(model.setRecord(0, record)){
+            model.submitAll();
+            return true;
+        }else{
+            return false;
+        }
+
+    }
+
+    bool cambiarContrasena(QString usuario, QString contrasena){
+        QSqlTableModel model;
+        model.setTable("funcionario");
+        model.setFilter("usuario = '" + usuario + "'");
+        model.select();
+        QSqlRecord record = model.record(0);
+        record.setValue("contrasena", contrasena);
+        if(model.setRecord(0, record)){
+            model.submitAll();
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+
+    /*Reportes*/
+
+    vector<ReporteDB> getReportesPendientes(){
+        ReporteDB reporte;
+        vector<ReporteDB> resultado;
+
+        abrirConexion();
+
+        QSqlTableModel model;
+        model.setTable("reporte");
+        model.setFilter("idfuncionario IS NULL");
+        model.select();
+        cerrarConexion();
+
+        for (int i=0; i < model.rowCount() ;i++) {
+
+            QString latitud = model.record(i).value("latitud").toString();
+            QString longitud = model.record(i).value("longitud").toString();
+            QString nombreOtroConduc = model.record(i).value("nombreOtroConduc").toString();
+            int idconductor = model.record(i).value("idconductor").toInt();
+            int idreporte = model.record(i).value("idreporte").toInt();
+
+            abrirConexion();
+            QSqlTableModel modelConductor;
+            modelConductor.setTable("conductor");
+            modelConductor.setFilter("idconductor = " + QString::number(idconductor));
+            modelConductor.select();
+            cerrarConexion();
+
+            QString nombreConductor = modelConductor.record(0).value("nombreComp").toString();
+
+           reporte.idreporte = idreporte;
+           reporte.latitud = latitud;
+           reporte.longitud = longitud;
+           reporte.nombreOtroConduc = nombreOtroConduc;
+           reporte.nombreConductor = nombreConductor;
+
+            resultado.push_back(reporte);
+        }
+
+
+        return resultado;
+    }
+
+
+    int getIdFuncionario(QString usuario){
+        int funcionario;
+        QSqlTableModel model;
+        model.setTable("funcionario");
+        model.setFilter("usuario = '" + usuario +"'");
+        model.select();
+        funcionario = model.record(0).value("idfuncionario").toInt();
+        return funcionario;
+    }
+
+    bool asignarReportePerito(int idPerito, int idReporte){
+
+        QSqlTableModel model;
+        model.setTable("reporte");
+        model.setFilter("idreporte = " + QString::number(idReporte));
+        model.select();
+        QSqlRecord record = model.record(0);
+        record.setValue("idFuncionario", QString::number(idPerito));
+        if(model.setRecord(0, record)){
+            model.submitAll();
+            return true;
+        }else{
+            return false;
+        }
+
+    }
+    vector<ReporteDB> getReportesAsignados(int idPerito){
+        ReporteDB reporte;
+        vector<ReporteDB> resultado;
+
+        abrirConexion();
+
+        QSqlTableModel model;
+        model.setTable("reporte");
+        model.setFilter("idfuncionario = " + QString::number(idPerito));
+        model.select();
+        cerrarConexion();
+
+        for (int i=0; i < model.rowCount() ;i++) {
+
+            QString latitud = model.record(i).value("latitud").toString();
+            QString longitud = model.record(i).value("longitud").toString();
+            QString nombreOtroConduc = model.record(i).value("nombreOtroConduc").toString();
+            int idconductor = model.record(i).value("idconductor").toInt();
+            int idreporte = model.record(i).value("idreporte").toInt();
+            int folioUnico_dictamen = model.record(i).value("folioUnico_dictamen").toInt();
+
+            abrirConexion();
+            QSqlTableModel modelConductor;
+            modelConductor.setTable("conductor");
+            modelConductor.setFilter("idconductor = " + QString::number(idconductor));
+            modelConductor.select();
+            cerrarConexion();
+
+           QString nombreConductor = modelConductor.record(0).value("nombreComp").toString();
+
+           reporte.idreporte = idreporte;
+           reporte.latitud = latitud;
+           reporte.longitud = longitud;
+           reporte.nombreOtroConduc = nombreOtroConduc;
+           reporte.nombreConductor = nombreConductor;
+           reporte.dictamen = folioUnico_dictamen;
+
+            resultado.push_back(reporte);
+        }
+
+
+        return resultado;
+    }
+
+
+    ReporteDB getReporte(int idReporte){
+        ReporteDB reporte;
+
+        QSqlTableModel model;
+        model.setTable("reporte");
+        model.setFilter("idreporte = " + QString::number(idReporte));
+        model.select();
+
+        QString latitud = model.record(0).value("latitud").toString();
+        QString longitud = model.record(0).value("longitud").toString();
+        QString nombreOtroConduc = model.record(0).value("nombreOtroConduc").toString();
+        int idconductor = model.record(0).value("idconductor").toInt();
+        int idreporte = model.record(0).value("idreporte").toInt();
+        int folioUnico_dictamen = model.record(0).value("folioUnico_dictamen").toInt();
+
+        QSqlTableModel modelConductor;
+        modelConductor.setTable("conductor");
+        modelConductor.setFilter("idconductor = " + QString::number(idconductor));
+        modelConductor.select();
+        cerrarConexion();
+
+       QString nombreConductor = modelConductor.record(0).value("nombreComp").toString();
+
+        reporte.idreporte = idreporte;
+        reporte.latitud = latitud;
+        reporte.longitud = longitud;
+        reporte.nombreOtroConduc = nombreOtroConduc;
+        reporte.nombreConductor = nombreConductor;
+        reporte.dictamen = folioUnico_dictamen;
+
+        return reporte;
+    }
+
+    bool registrarDictamen(DictamenDB dictamen){
+
+        QSqlTableModel model;
+        model.setTable("dictamen");
+        QSqlRecord record = model.record();
+        record.remove(record.indexOf("folioUnico"));
+        record.setValue("dictamen", dictamen.dictamen);
+        record.setValue("fechaHora", dictamen.fecha);
+        record.setValue("idfuncionario", dictamen.idfuncionario);
+        record.setValue("idReporte", dictamen.idreporte);
+        if(model.insertRecord(-1, record)){
+            model.submitAll();
+            QString idInsertado = getUltimoDictamen();
+
+            //Actualizar el reporte
+            qDebug() << idInsertado;
+            QSqlTableModel modelReporte;
+            modelReporte.setTable("reporte");
+            modelReporte.setFilter("idreporte = " + QString::number(dictamen.idreporte));
+            modelReporte.select();
+            QSqlRecord record2 = modelReporte.record(0);
+            record2.setValue("folioUnico_dictamen", idInsertado);
+            if(modelReporte.setRecord(0, record2)){
+                modelReporte.submitAll();
+                return true;
+            }else{
+                return false;
+            }
+        }else{
+            return false;
+        }
+
+    }
+
+    QString getUltimoDictamen(){
+         QSqlQuery query("SELECT * FROM dictamen ORDER BY folioUnico DESC LIMIT 1");
+         query.exec();
+         query.next();
+         QString id = query.value(0).toString();
+         return id;
+    }
+
+
+
+
+    DictamenDB getDictamen(int idReporte){
+        DictamenDB dictamen;
+
+        QSqlTableModel model;
+        model.setTable("dictamen");
+        model.setFilter("idreporte = " + QString::number(idReporte));
+        model.select();
+
+        int folioUnico = model.record(0).value("folioUnico").toInt();
+        QString dictamenTexto = model.record(0).value("dictamen").toString();
+        QString fechaHora = model.record(0).value("fechaHora").toString();
+        int idfuncionario = model.record(0).value("idfuncionario").toInt();
+        int idreporte = model.record(0).value("idreporte").toInt();
+
+
+        dictamen.folioUnico = folioUnico;
+        dictamen.dictamen = dictamenTexto;
+        dictamen.fecha = fechaHora;
+        dictamen.idfuncionario = idfuncionario;
+        dictamen.idreporte = idreporte;
+
+
+
+        return dictamen;
+
+
+    }
+
+
+
+};
